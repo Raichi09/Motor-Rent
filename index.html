@@ -1,0 +1,1820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#111827" />
+  <title>Motorcycle Rental Calculator</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --success: #16a34a;
+      --danger: #dc2626;
+      --dark: #111827;
+      --gray: #6b7280;
+      --light-gray: #f3f4f6;
+      --border: #e5e7eb;
+      --white: #ffffff;
+      --yellow: #f59e0b;
+    }
+
+    body {
+      font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Arial,
+        sans-serif;
+      background: #eef2f7;
+      color: var(--dark);
+      min-height: 100vh;
+    }
+
+    .container {
+      width: min(1100px, 94%);
+      margin: 0 auto;
+      padding: 25px 0 50px;
+    }
+
+    /* HEADER */
+
+    .header {
+      background: linear-gradient(135deg, #111827, #1f2937);
+      color: white;
+      border-radius: 20px;
+      padding: 25px;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .logo-icon {
+      width: 55px;
+      height: 55px;
+      background: #2563eb;
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+    }
+
+    .header h1 {
+      font-size: 25px;
+      margin-bottom: 4px;
+    }
+
+    .header p {
+      color: #cbd5e1;
+      font-size: 14px;
+    }
+
+    .rate-box {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 12px 18px;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .rate-box span {
+      display: block;
+      font-size: 12px;
+      color: #cbd5e1;
+      margin-bottom: 3px;
+    }
+
+    .rate-box strong {
+      font-size: 22px;
+      color: #fff;
+    }
+
+    /* MAIN GRID */
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: 0 5px 20px rgba(15, 23, 42, 0.06);
+      border: 1px solid rgba(229, 231, 235, 0.8);
+    }
+
+    .card-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .card-title h2 {
+      font-size: 18px;
+    }
+
+    .card-title span {
+      color: var(--gray);
+      font-size: 13px;
+    }
+
+    /* CALENDAR */
+
+    .calendar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .month-title {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .calendar-buttons {
+      display: flex;
+      gap: 7px;
+    }
+
+    .calendar-btn {
+      width: 38px;
+      height: 38px;
+      border: 1px solid var(--border);
+      background: white;
+      border-radius: 9px;
+      cursor: pointer;
+      font-size: 18px;
+      transition: 0.2s;
+    }
+
+    .calendar-btn:hover {
+      background: var(--light-gray);
+    }
+
+    .weekdays,
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+    }
+
+    .weekday {
+      text-align: center;
+      color: var(--gray);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 7px 0;
+    }
+
+    .day {
+      min-height: 58px;
+      border: 1px solid #edf0f3;
+      border-radius: 10px;
+      background: #fafafa;
+      cursor: pointer;
+      padding: 6px;
+      position: relative;
+      transition: all 0.18s ease;
+      user-select: none;
+    }
+
+    .day:hover {
+      border-color: #93c5fd;
+      background: #eff6ff;
+      transform: translateY(-1px);
+    }
+
+    .day.empty {
+      background: transparent;
+      border-color: transparent;
+      cursor: default;
+    }
+
+    .day-number {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .day-price {
+      position: absolute;
+      bottom: 5px;
+      left: 6px;
+      font-size: 10px;
+      color: #9ca3af;
+    }
+
+    .day.selected {
+      background: #2563eb;
+      border-color: #2563eb;
+      color: white;
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+    }
+
+    .day.selected .day-price {
+      color: #dbeafe;
+    }
+
+    .day.today {
+      border: 2px solid var(--yellow);
+    }
+
+    .day.today.selected {
+      border-color: #fbbf24;
+    }
+
+    .selected-check {
+      position: absolute;
+      right: 5px;
+      top: 5px;
+      font-size: 12px;
+    }
+
+    .calendar-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-top: 18px;
+      font-size: 12px;
+      color: var(--gray);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend-box {
+      width: 15px;
+      height: 15px;
+      border-radius: 4px;
+    }
+
+    .legend-selected {
+      background: var(--primary);
+    }
+
+    .legend-today {
+      border: 2px solid var(--yellow);
+      background: white;
+    }
+
+    /* FORM */
+
+    .form-group {
+      margin-bottom: 17px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 7px;
+      color: #374151;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 12px 13px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      outline: none;
+      font-size: 14px;
+      background: white;
+      transition: 0.2s;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .rate-input {
+      position: relative;
+    }
+
+    .peso-symbol {
+      position: absolute;
+      left: 13px;
+      top: 12px;
+      color: #6b7280;
+      font-weight: 600;
+    }
+
+    .rate-input input {
+      padding-left: 30px;
+    }
+
+    /* EXTRA CHARGES */
+
+    .extra-section {
+      margin-top: 20px;
+      border-top: 1px solid var(--border);
+      padding-top: 20px;
+    }
+
+    .extra-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .extra-header h3 {
+      font-size: 15px;
+    }
+
+    .add-btn {
+      border: none;
+      background: #dcfce7;
+      color: #15803d;
+      padding: 7px 11px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 12px;
+    }
+
+    .add-btn:hover {
+      background: #bbf7d0;
+    }
+
+    .extra-item {
+      display: grid;
+      grid-template-columns: 1fr 100px 35px;
+      gap: 7px;
+      margin-bottom: 8px;
+    }
+
+    .extra-item input {
+      min-width: 0;
+    }
+
+    .remove-btn {
+      border: none;
+      background: #fee2e2;
+      color: #dc2626;
+      border-radius: 9px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .remove-btn:hover {
+      background: #fecaca;
+    }
+
+    /* SUMMARY */
+
+    .summary {
+      background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+      border-radius: 14px;
+      padding: 18px;
+      margin-top: 20px;
+      border: 1px solid var(--border);
+    }
+
+    .summary h3 {
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      font-size: 14px;
+      color: #4b5563;
+    }
+
+    .summary-row strong {
+      color: var(--dark);
+    }
+
+    .summary-divider {
+      height: 1px;
+      background: #dbe1e8;
+      margin: 8px 0;
+    }
+
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 12px;
+    }
+
+    .total-label {
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .total {
+      font-size: 28px;
+      color: var(--primary);
+      font-weight: 800;
+    }
+
+    /* SELECTED DAYS */
+
+    .selected-days {
+      margin-top: 18px;
+    }
+
+    .selected-days-title {
+      font-size: 13px;
+      color: var(--gray);
+      margin-bottom: 8px;
+    }
+
+    .selected-list {
+      max-height: 120px;
+      overflow-y: auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .date-tag {
+      background: #dbeafe;
+      color: #1d4ed8;
+      padding: 5px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    /* BUTTONS */
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 20px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #374151;
+    }
+
+    .btn-secondary:hover {
+      background: #d1d5db;
+    }
+
+    .btn-danger {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .btn-danger:hover {
+      background: #fecaca;
+    }
+
+    /* STATUS */
+
+    .save-status {
+      text-align: center;
+      margin-top: 12px;
+      font-size: 11px;
+      color: var(--success);
+      min-height: 15px;
+    }
+
+    /* MOBILE */
+
+    @media (max-width: 800px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .header-content {
+        align-items: flex-start;
+      }
+    }
+
+    @media (max-width: 550px) {
+      .container {
+        width: 96%;
+        padding-top: 12px;
+      }
+
+      .header {
+        padding: 18px;
+        border-radius: 15px;
+      }
+
+      .header h1 {
+        font-size: 19px;
+      }
+
+      .logo-icon {
+        width: 45px;
+        height: 45px;
+        font-size: 22px;
+      }
+
+      .rate-box {
+        padding: 9px 12px;
+      }
+
+      .rate-box strong {
+        font-size: 18px;
+      }
+
+      .card {
+        padding: 15px;
+        border-radius: 15px;
+      }
+
+      .day {
+        min-height: 48px;
+      }
+
+      .day-price {
+        display: none;
+      }
+
+      .weekday {
+        font-size: 10px;
+      }
+
+      .extra-item {
+        grid-template-columns: 1fr 85px 35px;
+      }
+
+      .actions {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* PRINT */
+
+    @media print {
+      body {
+        background: white;
+      }
+
+      .header {
+        background: #111827 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .calendar-btn,
+      .add-btn,
+      .remove-btn,
+      .actions,
+      .save-status {
+        display: none !important;
+      }
+
+      .main-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .card {
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <!-- HEADER -->
+    <header class="header">
+      <div class="header-content">
+
+        <div class="logo">
+          <div class="logo-icon">🏍️</div>
+
+          <div>
+            <h1>Motorcycle Rental Calculator</h1>
+            <p>Track motorcycle usage and calculate payment</p>
+          </div>
+        </div>
+
+        <div class="rate-box">
+          <span>Daily Rate</span>
+          <strong>₱50</strong>
+        </div>
+
+      </div>
+    </header>
+
+
+    <div class="main-grid">
+
+      <!-- CALENDAR -->
+      <section class="card">
+
+        <div class="card-title">
+          <h2>📅 Usage Calendar</h2>
+          <span>Click a date to mark it used</span>
+        </div>
+
+        <div class="calendar-header">
+
+          <button
+            class="calendar-btn"
+            id="previousMonth"
+            title="Previous month"
+          >
+            ‹
+          </button>
+
+          <div class="month-title" id="monthTitle">
+            January 2026
+          </div>
+
+          <button
+            class="calendar-btn"
+            id="nextMonth"
+            title="Next month"
+          >
+            ›
+          </button>
+
+        </div>
+
+        <div class="weekdays">
+          <div class="weekday">Sun</div>
+          <div class="weekday">Mon</div>
+          <div class="weekday">Tue</div>
+          <div class="weekday">Wed</div>
+          <div class="weekday">Thu</div>
+          <div class="weekday">Fri</div>
+          <div class="weekday">Sat</div>
+        </div>
+
+        <div
+          class="calendar-grid"
+          id="calendar"
+        ></div>
+
+        <div class="calendar-legend">
+
+          <div class="legend-item">
+            <div class="legend-box legend-selected"></div>
+            Motorcycle used
+          </div>
+
+          <div class="legend-item">
+            <div class="legend-box legend-today"></div>
+            Today
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- CALCULATOR -->
+      <section class="card">
+
+        <div class="card-title">
+          <h2>🧮 Payment Calculator</h2>
+          <span>Automatic</span>
+        </div>
+
+
+        <!-- CUSTOMER -->
+        <div class="form-group">
+          <label for="customerName">
+            Customer Name
+          </label>
+
+          <input
+            type="text"
+            id="customerName"
+            placeholder="Enter customer name"
+          />
+        </div>
+
+
+        <!-- DAILY RATE -->
+        <div class="form-group">
+
+          <label for="dailyRate">
+            Motorcycle Daily Rate
+          </label>
+
+          <div class="rate-input">
+
+            <span class="peso-symbol">₱</span>
+
+            <input
+              type="number"
+              id="dailyRate"
+              value="50"
+              min="0"
+              step="1"
+            />
+
+          </div>
+
+        </div>
+
+
+        <!-- EXTRA CHARGES -->
+        <div class="extra-section">
+
+          <div class="extra-header">
+
+            <h3>💰 Extra Charges</h3>
+
+            <button
+              class="add-btn"
+              id="addExtra"
+              type="button"
+            >
+              + Add
+            </button>
+
+          </div>
+
+          <div id="extraCharges"></div>
+
+        </div>
+
+
+        <!-- SUMMARY -->
+        <div class="summary">
+
+          <h3>Payment Summary</h3>
+
+          <div class="summary-row">
+            <span>Days Used</span>
+            <strong id="daysUsed">0 days</strong>
+          </div>
+
+          <div class="summary-row">
+            <span>Motorcycle Rental</span>
+            <strong id="rentalCost">₱0.00</strong>
+          </div>
+
+          <div class="summary-row">
+            <span>Extra Charges</span>
+            <strong id="extraCost">₱0.00</strong>
+          </div>
+
+          <div class="summary-divider"></div>
+
+          <div class="total-row">
+
+            <span class="total-label">
+              TOTAL
+            </span>
+
+            <span
+              class="total"
+              id="grandTotal"
+            >
+              ₱0.00
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <!-- SELECTED DAYS -->
+        <div class="selected-days">
+
+          <div class="selected-days-title">
+            Selected rental dates:
+          </div>
+
+          <div
+            class="selected-list"
+            id="selectedList"
+          >
+            <span style="color:#9ca3af;font-size:12px;">
+              No dates selected
+            </span>
+          </div>
+
+        </div>
+
+
+        <!-- ACTION BUTTONS -->
+        <div class="actions">
+
+          <button
+            class="btn btn-primary"
+            id="printBtn"
+          >
+            🖨️ Print / Save PDF
+          </button>
+
+          <button
+            class="btn btn-secondary"
+            id="todayBtn"
+          >
+            📅 Go to Today
+          </button>
+
+          <button
+            class="btn btn-danger"
+            id="clearBtn"
+          >
+            🗑️ Clear All
+          </button>
+
+        </div>
+
+        <div
+          class="save-status"
+          id="saveStatus"
+        ></div>
+
+      </section>
+
+    </div>
+
+  </div>
+
+
+  <script>
+
+    /*
+     * =====================================================
+     * MOTORCYCLE RENTAL CALCULATOR
+     * =====================================================
+     *
+     * Daily rate:
+     * ₱50 by default
+     *
+     * Change the rate in the input box if needed.
+     *
+     * Data is saved using localStorage.
+     * =====================================================
+     */
+
+
+    // -----------------------------
+    // BASIC SETTINGS
+    // -----------------------------
+
+    const STORAGE_KEY = "motorcycleRentalCalculator";
+
+    const defaultRate = 50;
+
+
+    // -----------------------------
+    // STATE
+    // -----------------------------
+
+    let currentDate = new Date();
+
+    let selectedDates = [];
+
+    let extraCharges = [];
+
+    let customerName = "";
+
+
+    // -----------------------------
+    // DOM ELEMENTS
+    // -----------------------------
+
+    const calendar = document.getElementById("calendar");
+
+    const monthTitle = document.getElementById("monthTitle");
+
+    const dailyRateInput =
+      document.getElementById("dailyRate");
+
+    const customerNameInput =
+      document.getElementById("customerName");
+
+    const daysUsedElement =
+      document.getElementById("daysUsed");
+
+    const rentalCostElement =
+      document.getElementById("rentalCost");
+
+    const extraCostElement =
+      document.getElementById("extraCost");
+
+    const grandTotalElement =
+      document.getElementById("grandTotal");
+
+    const selectedList =
+      document.getElementById("selectedList");
+
+    const extraChargesContainer =
+      document.getElementById("extraCharges");
+
+    const saveStatus =
+      document.getElementById("saveStatus");
+
+
+    // -----------------------------
+    // FORMAT PESO
+    // -----------------------------
+
+    function formatPeso(amount) {
+
+      return "₱" + Number(amount).toLocaleString(
+        "en-PH",
+        {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        }
+      );
+
+    }
+
+
+    // -----------------------------
+    // DATE KEY
+    // -----------------------------
+
+    function dateKey(year, month, day) {
+
+      return (
+        year +
+        "-" +
+        String(month + 1).padStart(2, "0") +
+        "-" +
+        String(day).padStart(2, "0")
+      );
+
+    }
+
+
+    // -----------------------------
+    // RENDER CALENDAR
+    // -----------------------------
+
+    function renderCalendar() {
+
+      calendar.innerHTML = "";
+
+      const year =
+        currentDate.getFullYear();
+
+      const month =
+        currentDate.getMonth();
+
+
+      const monthName =
+        currentDate.toLocaleString(
+          "en-US",
+          {
+            month: "long"
+          }
+        );
+
+
+      monthTitle.textContent =
+        `${monthName} ${year}`;
+
+
+      // First day of month
+      const firstDay =
+        new Date(year, month, 1).getDay();
+
+
+      // Number of days in month
+      const daysInMonth =
+        new Date(year, month + 1, 0).getDate();
+
+
+      // Empty boxes before first day
+      for (
+        let i = 0;
+        i < firstDay;
+        i++
+      ) {
+
+        const emptyDay =
+          document.createElement("div");
+
+        emptyDay.className =
+          "day empty";
+
+        calendar.appendChild(emptyDay);
+
+      }
+
+
+      // Days
+      for (
+        let day = 1;
+        day <= daysInMonth;
+        day++
+      ) {
+
+        const key =
+          dateKey(year, month, day);
+
+
+        const dayElement =
+          document.createElement("div");
+
+        dayElement.className = "day";
+
+
+        // Check selected
+        if (
+          selectedDates.includes(key)
+        ) {
+
+          dayElement.classList.add(
+            "selected"
+          );
+
+        }
+
+
+        // Check today
+        const today =
+          new Date();
+
+
+        if (
+          day === today.getDate() &&
+          month === today.getMonth() &&
+          year === today.getFullYear()
+        ) {
+
+          dayElement.classList.add(
+            "today"
+          );
+
+        }
+
+
+        dayElement.innerHTML = `
+
+          <span class="day-number">
+            ${day}
+          </span>
+
+          <span class="day-price">
+            ₱${Number(dailyRateInput.value || defaultRate)}
+          </span>
+
+          ${
+            selectedDates.includes(key)
+              ? `<span class="selected-check">✓</span>`
+              : ""
+          }
+
+        `;
+
+
+        dayElement.addEventListener(
+          "click",
+          () => {
+
+            toggleDate(key);
+
+          }
+        );
+
+
+        calendar.appendChild(dayElement);
+
+      }
+
+    }
+
+
+    // -----------------------------
+    // TOGGLE DATE
+    // -----------------------------
+
+    function toggleDate(key) {
+
+      if (
+        selectedDates.includes(key)
+      ) {
+
+        selectedDates =
+          selectedDates.filter(
+            date => date !== key
+          );
+
+      } else {
+
+        selectedDates.push(key);
+
+      }
+
+
+      // Sort dates
+      selectedDates.sort();
+
+
+      saveData();
+
+      renderCalendar();
+
+      calculateTotal();
+
+    }
+
+
+    // -----------------------------
+    // CALCULATE EXTRA CHARGES
+    // -----------------------------
+
+    function calculateExtraCharges() {
+
+      let total = 0;
+
+      extraCharges.forEach(
+        charge => {
+
+          const amount =
+            Number(charge.amount) || 0;
+
+          total += amount;
+
+        }
+      );
+
+      return total;
+
+    }
+
+
+    // -----------------------------
+    // CALCULATE TOTAL
+    // -----------------------------
+
+    function calculateTotal() {
+
+      const rate =
+        Number(
+          dailyRateInput.value
+        ) || 0;
+
+
+      const days =
+        selectedDates.length;
+
+
+      const rentalCost =
+        days * rate;
+
+
+      const extraCost =
+        calculateExtraCharges();
+
+
+      const total =
+        rentalCost + extraCost;
+
+
+      daysUsedElement.textContent =
+        `${days} ${days === 1 ? "day" : "days"}`;
+
+
+      rentalCostElement.textContent =
+        formatPeso(rentalCost);
+
+
+      extraCostElement.textContent =
+        formatPeso(extraCost);
+
+
+      grandTotalElement.textContent =
+        formatPeso(total);
+
+
+      renderSelectedDates();
+
+    }
+
+
+    // -----------------------------
+    // DISPLAY SELECTED DATES
+    // -----------------------------
+
+    function renderSelectedDates() {
+
+      selectedList.innerHTML = "";
+
+
+      if (
+        selectedDates.length === 0
+      ) {
+
+        selectedList.innerHTML = `
+          <span style="
+            color:#9ca3af;
+            font-size:12px;
+          ">
+            No dates selected
+          </span>
+        `;
+
+        return;
+
+      }
+
+
+      selectedDates.forEach(
+        dateString => {
+
+          const date =
+            new Date(
+              dateString + "T00:00:00"
+            );
+
+
+          const formatted =
+            date.toLocaleDateString(
+              "en-US",
+              {
+                month: "short",
+                day: "numeric",
+                year: "numeric"
+              }
+            );
+
+
+          const tag =
+            document.createElement("span");
+
+          tag.className =
+            "date-tag";
+
+          tag.textContent =
+            formatted;
+
+
+          selectedList.appendChild(tag);
+
+        }
+      );
+
+    }
+
+
+    // -----------------------------
+    // ADD EXTRA CHARGE
+    // -----------------------------
+
+    function addExtraCharge(
+      description = "",
+      amount = ""
+    ) {
+
+      const id =
+        Date.now() +
+        Math.random();
+
+
+      extraCharges.push({
+        id,
+        description,
+        amount
+      });
+
+
+      renderExtraCharges();
+
+      calculateTotal();
+
+      saveData();
+
+    }
+
+
+    // -----------------------------
+    // REMOVE EXTRA CHARGE
+    // -----------------------------
+
+    function removeExtraCharge(id) {
+
+      extraCharges =
+        extraCharges.filter(
+          charge => charge.id !== id
+        );
+
+
+      renderExtraCharges();
+
+      calculateTotal();
+
+      saveData();
+
+    }
+
+
+    // -----------------------------
+    // RENDER EXTRA CHARGES
+    // -----------------------------
+
+    function renderExtraCharges() {
+
+      extraChargesContainer.innerHTML = "";
+
+
+      if (
+        extraCharges.length === 0
+      ) {
+
+        extraChargesContainer.innerHTML = `
+          <div style="
+            color:#9ca3af;
+            font-size:12px;
+            padding:8px 0;
+          ">
+            No extra charges.
+            Click "+ Add" to add load,
+            fuel, or other payments.
+          </div>
+        `;
+
+        return;
+
+      }
+
+
+      extraCharges.forEach(
+        charge => {
+
+          const item =
+            document.createElement("div");
+
+          item.className =
+            "extra-item";
+
+
+          item.innerHTML = `
+
+            <input
+              type="text"
+              class="extra-description"
+              placeholder="Example: Load"
+              value="${escapeHtml(
+                charge.description
+              )}"
+            />
+
+            <input
+              type="number"
+              class="extra-amount"
+              placeholder="Amount"
+              min="0"
+              step="0.01"
+              value="${charge.amount}"
+            />
+
+            <button
+              type="button"
+              class="remove-btn"
+              title="Remove"
+            >
+              ×
+            </button>
+
+          `;
+
+
+          const descriptionInput =
+            item.querySelector(
+              ".extra-description"
+            );
+
+
+          const amountInput =
+            item.querySelector(
+              ".extra-amount"
+            );
+
+
+          const removeButton =
+            item.querySelector(
+              ".remove-btn"
+            );
+
+
+          descriptionInput.addEventListener(
+            "input",
+            () => {
+
+              charge.description =
+                descriptionInput.value;
+
+              saveData();
+
+            }
+          );
+
+
+          amountInput.addEventListener(
+            "input",
+            () => {
+
+              charge.amount =
+                amountInput.value;
+
+              calculateTotal();
+
+              saveData();
+
+            }
+          );
+
+
+          removeButton.addEventListener(
+            "click",
+            () => {
+
+              removeExtraCharge(
+                charge.id
+              );
+
+            }
+          );
+
+
+          extraChargesContainer.appendChild(
+            item
+          );
+
+        }
+      );
+
+    }
+
+
+    // -----------------------------
+    // ESCAPE HTML
+    // -----------------------------
+
+    function escapeHtml(text) {
+
+      return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+    }
+
+
+    // -----------------------------
+    // SAVE DATA
+    // -----------------------------
+
+    function saveData() {
+
+      const data = {
+
+        selectedDates,
+
+        extraCharges,
+
+        customerName:
+          customerNameInput.value,
+
+        dailyRate:
+          dailyRateInput.value
+
+      };
+
+
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(data)
+      );
+
+
+      saveStatus.textContent =
+        "✓ Automatically saved";
+
+
+      clearTimeout(
+        window.saveStatusTimer
+      );
+
+
+      window.saveStatusTimer =
+        setTimeout(
+          () => {
+
+            saveStatus.textContent =
+              "";
+
+          },
+          1500
+        );
+
+    }
+
+
+    // -----------------------------
+    // LOAD DATA
+    // -----------------------------
+
+    function loadData() {
+
+      const saved =
+        localStorage.getItem(
+          STORAGE_KEY
+        );
+
+
+      if (!saved) {
+
+        dailyRateInput.value =
+          defaultRate;
+
+        return;
+
+      }
+
+
+      try {
+
+        const data =
+          JSON.parse(saved);
+
+
+        selectedDates =
+          Array.isArray(
+            data.selectedDates
+          )
+            ? data.selectedDates
+            : [];
+
+
+        extraCharges =
+          Array.isArray(
+            data.extraCharges
+          )
+            ? data.extraCharges
+            : [];
+
+
+        customerName =
+          data.customerName || "";
+
+
+        customerNameInput.value =
+          customerName;
+
+
+        dailyRateInput.value =
+          data.dailyRate || defaultRate;
+
+
+      } catch (error) {
+
+        console.error(
+          "Could not load saved data:",
+          error
+        );
+
+      }
+
+    }
+
+
+    // -----------------------------
+    // PREVIOUS MONTH
+    // -----------------------------
+
+    document
+      .getElementById("previousMonth")
+      .addEventListener(
+        "click",
+        () => {
+
+          currentDate.setMonth(
+            currentDate.getMonth() - 1
+          );
+
+          renderCalendar();
+
+        }
+      );
+
+
+    // -----------------------------
+    // NEXT MONTH
+    // -----------------------------
+
+    document
+      .getElementById("nextMonth")
+      .addEventListener(
+        "click",
+        () => {
+
+          currentDate.setMonth(
+            currentDate.getMonth() + 1
+          );
+
+          renderCalendar();
+
+        }
+      );
+
+
+    // -----------------------------
+    // ADD EXTRA
+    // -----------------------------
+
+    document
+      .getElementById("addExtra")
+      .addEventListener(
+        "click",
+        () => {
+
+          addExtraCharge();
+
+        }
+      );
+
+
+    // -----------------------------
+    // RATE CHANGE
+    // -----------------------------
+
+    dailyRateInput.addEventListener(
+      "input",
+      () => {
+
+        renderCalendar();
+
+        calculateTotal();
+
+        saveData();
+
+      }
+    );
+
+
+    // -----------------------------
+    // CUSTOMER NAME
+    // -----------------------------
+
+    customerNameInput.addEventListener(
+      "input",
+      () => {
+
+        saveData();
+
+      }
+    );
+
+
+    // -----------------------------
+    // TODAY BUTTON
+    // -----------------------------
+
+    document
+      .getElementById("todayBtn")
+      .addEventListener(
+        "click",
+        () => {
+
+          currentDate = new Date();
+
+          renderCalendar();
+
+        }
+      );
+
+
+    // -----------------------------
+    // PRINT
+    // -----------------------------
+
+    document
+      .getElementById("printBtn")
+      .addEventListener(
+        "click",
+        () => {
+
+          window.print();
+
+        }
+      );
+
+
+    // -----------------------------
+    // CLEAR ALL
+    // -----------------------------
+
+    document
+      .getElementById("clearBtn")
+      .addEventListener(
+        "click",
+        () => {
+
+          const confirmed =
+            confirm(
+              "Are you sure you want to clear all selected dates and extra charges?"
+            );
+
+
+          if (!confirmed) {
+            return;
+          }
+
+
+          selectedDates = [];
+
+          extraCharges = [];
+
+          customerNameInput.value = "";
+
+          dailyRateInput.value =
+            defaultRate;
+
+
+          localStorage.removeItem(
+            STORAGE_KEY
+          );
+
+
+          renderCalendar();
+
+          renderExtraCharges();
+
+          calculateTotal();
+
+
+          saveStatus.textContent =
+            "✓ Cleared";
+
+        }
+      );
+
+
+    // -----------------------------
+    // INITIALIZE
+    // -----------------------------
+
+    loadData();
+
+    renderCalendar();
+
+    renderExtraCharges();
+
+    calculateTotal();
+
+  </script>
+
+</body>
+</html>
